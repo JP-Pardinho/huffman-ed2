@@ -1,21 +1,24 @@
 #ifndef HUFFMAN_H
+#define HUFFMAN_H
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include "heap.h"
 
-typedef struct no
-{
-    unsigned char caractere;
-    int frequencia;
-    struct no *esq;
-    struct no *dir;
-} No;
+// typedef struct no {
+//     unsigned char caractere;
+//     int frequencia;
+//     struct no *esq;
+//     struct no *dir;
+// } No;
 
-No *criaNo(unsigned char caractere, int frequencia);
+No *criaNoFolha(unsigned char caractere, int freq);
 No *criaNoInterno(No *esq, No *dir);
-int contarFrequencia(const char *arquivo, long long *tamanho);
-int comparar(No *raiz, No *novo);
+void contarFrequencia(const char *arquivo, long long *tamanho);
+void imprimirTabelaFrequencias(long long *frequencias);
+No *criaArvoreHuffman(long long *frequencias);
+void construirHeap(Heap *h, long long *frequencias);
 
 // --- FUNÇÕES A IMPLEMENTAR --- 
 // Imprimir arvore de huffman

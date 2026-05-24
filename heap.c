@@ -1,40 +1,7 @@
 #include "heap.h"
 
-void troca(void **a, void **b) {
-    void *aux = *a;
-    *a = *b;
-    *b = aux;
-}
-
-void corrigeDescendo(Heap *h, int i) {
-    int menor = i;
-    int esq = 2*i + 1;
-    int dir = 2*i + 2;
-
-    if (esq <= h->tamanho && h->dados[esq] < h->dados[menor])
-        menor = esq;
-    
-    if (dir <= h->tamanho && h->dados[dir] < h->dados[menor])
-        menor = dir;
-
-    if (menor != i) {
-        troca(&h->dados[i], &h->dados[menor]);
-        corrigeDescendo(h, menor);
-    }
-}
-
-void corrigeSubindo(Heap *h, int i) {
-    int pai = (i - 1) / 2;
-
-    if (i > 0 && h->dados[i] < h->dados[pai]) {
-        troca(&h->dados[i], &h->dados[pai]);
-        corrigeSubindo(h, pai);
-    }
-}
-
-    
-Heap *criaHeap(Heap *h, int capacidade) {
-    h = (Heap *)malloc(sizeof(Heap));
+Heap *criaHeap(int capacidade) {
+    Heap *h = (Heap *)malloc(sizeof(Heap));
 
     if (h == NULL) {
         printf("Erro ao criar heap.\n");
@@ -45,6 +12,7 @@ Heap *criaHeap(Heap *h, int capacidade) {
 
     if (h->dados == NULL) {
         printf("Erro ao criar o vetor void\n");
+        free(h);
         exit(1);
     }
 
@@ -54,7 +22,6 @@ Heap *criaHeap(Heap *h, int capacidade) {
 }
 
 void insereHeap(Heap *h, void *dado) {
-
     if (h == NULL) {
         return;
     }
@@ -69,13 +36,52 @@ void insereHeap(Heap *h, void *dado) {
     corrigeSubindo(h, h->tamanho - 1);
 }
 
-void extrairMin(Heap *h) {
+void *extraiMinimo(Heap *h) {
     if (h == NULL || h->tamanho == 0) 
-        return;
+        return NULL;
 
     void *raiz = h->dados[0];
     h->dados[0] = h->dados[h->tamanho - 1];
     h->tamanho--;
-    
     corrigeDescendo(h, 0);
+    return raiz;
 }
+
+void troca(void **a, void **b) {
+    void *aux = *a;
+    *a = *b;
+    *b = aux;
+}
+
+void corrigeDescendo(Heap *h, int i) {
+    int menor = i;
+    int esq = 2*i + 1;
+    int dir = 2*i + 2;
+
+    if (esq < h->tamanho && comparar(h->dados[menor], h->dados[esq]))
+        menor = esq;
+    
+    if (dir < h->tamanho && comparar(h->dados[menor], h->dados[dir]))
+        menor = dir;
+
+    if (menor != i) {
+        troca(&h->dados[i], &h->dados[menor]);
+        corrigeDescendo(h, menor);
+    }
+}
+
+void corrigeSubindo(Heap *h, int i) {
+    int pai = (i - 1) / 2;
+
+    if (i > 0 && h->dados[i] != NULL && comparar(h->dados[pai], h->dados[i])) {
+        troca(&h->dados[i], &h->dados[pai]);
+        corrigeSubindo(h, pai);
+    }
+}
+
+int comparar(No *pai, No *filho) {
+    if (filho->frequencia < pai->frequencia)
+        return 1;
+    else 
+        return 0;
+} 

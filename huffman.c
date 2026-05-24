@@ -1,5 +1,6 @@
 #include "huffman.h"
 
+
 No *criaNoFolha(unsigned char caractere, int freq) {
     No *novo = (No *)malloc(sizeof(No));
     if (novo == NULL) {
@@ -28,10 +29,10 @@ No *criaNoInterno(No *esq, No *dir) {
     return novo;
 }
 
-void contaFrequencia(const char *arquivo, long long *tabelaFreq) {
+void contarFrequencia(const char *arquivo, long long *tabelaFreq) {
     long long vetor[256] = {0};
     
-    FILE *file = fopen(arquivo, "rb");
+    FILE *file = fopen(arquivo, "r");
     if (file == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         exit(1);
@@ -47,23 +48,58 @@ void contaFrequencia(const char *arquivo, long long *tabelaFreq) {
         tabelaFreq[i] = vetor[i];
     }
 }
-
-int *comparar(No *pai, No *filho) {
-    if (filho->frequencia < pai->frequencia)
-        return 1;
-    else 
-        return 0;
-}
  
-void *Huffman(char caracteres)
-{
+No *criaArvoreHuffman(long long *frequencias) {
+    Heap *h = criaHeap(256);
+    construirHeap(h, frequencias);
+
     int i, n;
-    No x, y;
+    No *x, *y, *z;
+    n = h->tamanho;
 
-    n = strlen(caracteres);
-    char auxCaracteres = caracteres;
+    for (i = 0; i < n; i++) {
+        x = extraiMinimo(h);
+        y = extraiMinimo(h);
+        z = criaNoInterno(x, y);
+        insereHeap(h, z);
+    }
 
-    for (i = 0; i < n; i++)
-    {
+    return extraiMinimo(h);
+}
+
+void imprimirTabelaFrequencias(long long *frequencias) {
+    printf("Tabela de Frequências:\n");
+    for (int i = 0; i < 256; i++) {
+        if (frequencias[i] > 0) {
+            printf("Caractere: '%c' (ASCII: %d) - Frequência: %lld\n", i, i, frequencias[i]);
+        }
+    }
+}
+
+void imprimirArvoreHuffman(No *raiz, int nivel) {
+    if (raiz == NULL) {
+        return;
+    }
+
+    imprimirArvoreHuffman(raiz->esq, nivel + 1);
+    
+    for (int i = 0; i < nivel; i++) {
+        printf("  ");
+    }
+    if (raiz->caractere != '#') {
+        printf("Caractere: '%c' (ASCII: %d) - Frequência: %d\n", raiz->caractere, raiz->caractere, raiz->frequencia);
+    } else {
+        printf("Nó Interno - Frequência: %d\n", raiz->frequencia);
+    }
+    
+    imprimirArvoreHuffman(raiz->dir, nivel + 1);
+}
+
+void construirHeap(Heap *h, long long *frequencias) {
+    for (int i = 0; i < 256; i++) {
+        if (frequencias[i] > 0) {
+            No *novoNo = criaNoFolha((unsigned char)i, frequencias[i]);
+            insereHeap(h, novoNo);
+        }
     }
 }

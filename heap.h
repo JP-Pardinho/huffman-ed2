@@ -1,24 +1,29 @@
 #ifndef HEAP_H
+#define HEAP_H
+
 #include <stdio.h>
 #include <stdlib.h>
-#include "huffman.h"
 
-typedef struct heap 
-{
+typedef struct heap {
     void **dados;
     int tamanho;
     int capacidade;
 } Heap;
 
-Heap *criaHeap(Heap *h, int capacidade);
+typedef struct no {
+    unsigned char caractere;
+    int frequencia;
+    struct no *esq;
+    struct no *dir;
+} No;
+
+Heap *criaHeap(int capacidade);
 void insereHeap(Heap *h, void *dado);
+void *extraiMinimo(Heap *h);
 
-
-/* 
-void destroiHeap(Heap *h);
-void insereHeap(Heap *h, void *item);
-void extraiMinimo(Heap *h);
-void heapFy(Heap *h, int indice);
-*/
+void corrigeSubindo(Heap *h, int i);
+void corrigeDescendo(Heap *h, int i);
+void troca(void **a, void **b);
+int comparar(No *pai, No *filho);
 
 #endif

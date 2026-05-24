@@ -1,12 +1,10 @@
-#include <stdio.h>
 #include "huffman.h"
 #include "heap.h"
 
-int main()
-{
-    char texto[100];
-    Heap *novoHeap = NULL;
-    
+int main() {
+    long long frequencias[256] = {0};
+    contarFrequencia("arquivo.txt", frequencias);
+    imprimirTabelaFrequencias(frequencias);
 
     return 0;
 }
