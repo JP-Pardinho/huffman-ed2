@@ -25,6 +25,10 @@ void construirHeap(Heap *h, long long *frequencias);
 void imprimirArvoreHuffman(No *raiz, int nivel);
 void liberarArvore(No *raiz);
 
+void gerarCodigosHuffman(No *raiz, char codigos[256][256], char *caminho, int nivel);
+void compactar(const char *arquivoEntrada, const char *arquivoSaida, char codigos[256][256], long long *frequencias);
+void descompactar(const char *arquivoEntrada, const char *arquivoSaida);
+
 // --- FUNÇÕES A IMPLEMENTAR --- 
 // Imprimir arvore de huffman
 // Imprimir tabela de frequencias 
