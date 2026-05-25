@@ -1,7 +1,7 @@
 #include "huffman.h"
 
 
-No *criaNoFolha(unsigned char caractere, int freq) {
+No *criaNoFolha(unsigned char caractere, long long freq) {
     No *novo = (No *)malloc(sizeof(No));
     if (novo == NULL) {
         printf("\nNão foi possível aloccar o novo Nó!\n");
@@ -53,18 +53,23 @@ No *criaArvoreHuffman(long long *frequencias) {
     Heap *h = criaHeap(256);
     construirHeap(h, frequencias);
 
-    int i, n;
-    No *x, *y, *z;
-    n = h->tamanho;
+    if (h->tamanho == 1) {
+        No *folha = extraiMinimo(h);
+        No *raiz = criaNoInterno(folha, NULL);
+        liberaHeap(h);
+        return raiz;
+    }
 
-    for (i = 0; i < n; i++) {
-        x = extraiMinimo(h);
-        y = extraiMinimo(h);
-        z = criaNoInterno(x, y);
+    while (h->tamanho > 1) {
+        No *x = extraiMinimo(h);
+        No *y = extraiMinimo(h);
+        No *z = criaNoInterno(x, y);
         insereHeap(h, z);
     }
 
-    return extraiMinimo(h);
+    No *raiz = extraiMinimo(h);
+    liberaHeap(h);
+    return raiz;
 }
 
 void imprimirTabelaFrequencias(long long *frequencias) {
@@ -87,9 +92,9 @@ void imprimirArvoreHuffman(No *raiz, int nivel) {
         printf("  ");
     }
     if (raiz->caractere != '#') {
-        printf("Caractere: '%c' (ASCII: %d) - Frequência: %d\n", raiz->caractere, raiz->caractere, raiz->frequencia);
+        printf("Caractere: '%c' (ASCII: %d) - Frequência: %lld\n", raiz->caractere, raiz->caractere, raiz->frequencia);
     } else {
-        printf("Nó Interno - Frequência: %d\n", raiz->frequencia);
+        printf("Nó Interno - Frequência: %lld\n", raiz->frequencia);
     }
     
     imprimirArvoreHuffman(raiz->dir, nivel + 1);
@@ -102,4 +107,49 @@ void construirHeap(Heap *h, long long *frequencias) {
             insereHeap(h, novoNo);
         }
     }
+}
+
+
+// ...existing code...
+
+// void imprimirArvoreHuffman(No *raiz, int nivel) {
+//     if (raiz == NULL) {
+//         return;
+//     }
+
+//     // Imprime filho direito primeiro (para visualizar melhor)
+//     imprimirArvoreHuffman(raiz->dir, nivel + 1);
+    
+//     // Indenta baseado no nível
+//     for (int i = 0; i < nivel; i++) {
+//         printf("    ");
+//     }
+    
+//     // Imprime o nó
+//     if (raiz->caractere == '#') {
+//         // Nó interno - mostra só a frequência
+//         printf("(%lld)\n", raiz->frequencia);
+//     } else {
+//         // Nó folha - mostra caractere e frequência
+//         if (raiz->caractere == '\n')
+//             printf("\\n (%lld)\n", raiz->frequencia);
+//         else if (raiz->caractere == '\t')
+//             printf("\\t (%lld)\n", raiz->frequencia);
+//         else if (raiz->caractere == ' ')
+//             printf("ESP (%lld)\n", raiz->frequencia);
+//         else
+//             printf("%c (%lld)\n", raiz->caractere, raiz->frequencia);
+//     }
+    
+//     // Imprime filho esquerdo depois
+//     imprimirArvoreHuffman(raiz->esq, nivel + 1);
+// }
+
+void liberarArvore(No *raiz) {
+    if (raiz == NULL)
+        return;
+    
+    liberarArvore(raiz->esq);
+    liberarArvore(raiz->dir);
+    free(raiz);
 }

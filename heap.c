@@ -47,6 +47,13 @@ void *extraiMinimo(Heap *h) {
     return raiz;
 }
 
+void liberaHeap(Heap *h) {
+    if (h != NULL) {
+        free(h->dados);
+        free(h);
+    }
+}
+
 void troca(void **a, void **b) {
     void *aux = *a;
     *a = *b;

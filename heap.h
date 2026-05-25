@@ -12,7 +12,7 @@ typedef struct heap {
 
 typedef struct no {
     unsigned char caractere;
-    int frequencia;
+    long long frequencia;
     struct no *esq;
     struct no *dir;
 } No;
@@ -25,5 +25,6 @@ void corrigeSubindo(Heap *h, int i);
 void corrigeDescendo(Heap *h, int i);
 void troca(void **a, void **b);
 int comparar(No *pai, No *filho);
+void liberaHeap(Heap *h);
 
 #endif

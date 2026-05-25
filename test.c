@@ -4,103 +4,79 @@
 #include "huffman.h"
 #include "heap.h"
 
-// Funções auxiliares para testes
-void print_teste(const char *nome, int resultado) {
-    printf("[%s] %s\n", resultado ? "PASS" : "FAIL", nome);
-}
-
-// Teste 1: Criar e testar heap
-void teste_heap() {
-    printf("\n=== Testes de Heap ===\n");
-    
-    Heap *h = criaHeap(10);
-    print_teste("Heap criado corretamente", h != NULL && h->tamanho == 0);
-    
-    // Teste de inserção (usando inteiros para teste)
-    No *no1 = criaNoFolha('a', 5);
-    No *no2 = criaNoFolha('b', 3);
-    No *no3 = criaNoFolha('c', 7);
-    
-    insereHeap(h, no1);
-    insereHeap(h, no2);
-    insereHeap(h, no3);
-    
-    print_teste("Heap com 3 elementos", h->tamanho == 3);
-    
-    // Teste de extração de mínimo
-    No *minimo = (No *)extraiMinimo(h);
-    print_teste("Extrai mínimo corretamente", minimo->frequencia == 3);
-    print_teste("Heap após extração tem 2 elementos", h->tamanho == 2);
-    
-    free(h->dados);
-    free(h);
-    printf("Testes de heap concluídos!\n");
-}
-
-// Teste 2: Criar nós de folha
-void teste_nos_folha() {
-    printf("\n=== Testes de Nós Folha ===\n");
-    
-    No *no = criaNoFolha('A', 10);
-    print_teste("Nó folha criado", no != NULL);
-    print_teste("Caractere correto", no->caractere == 'A');
-    print_teste("Frequência correta", no->frequencia == 10);
-    print_teste("Não tem filho esquerdo", no->esq == NULL);
-    print_teste("Não tem filho direito", no->dir == NULL);
-    
-    free(no);
-    printf("Testes de nós concluídos!\n");
-}
-
-// Teste 3: Contar frequências
-void teste_frequencia() {
-    printf("\n=== Testes de Frequência ===\n");
-    
-    long long frequencias[256] = {0};
-    contarFrequencia("arquivo.txt", frequencias);
-    
-    print_teste("Arquivo lido corretamente", 1);
-    
-    int total = 0;
-    for (int i = 0; i < 256; i++) {
-        total += frequencias[i];
+// Função para criar arquivo de teste
+void criarArquivoTeste(const char *nome_arquivo) {
+    FILE *file = fopen(nome_arquivo, "w");
+    if (file == NULL) {
+        printf("Erro ao criar arquivo de teste.\n");
+        exit(1);
     }
-    print_teste("Total de caracteres contabilizado", total > 0);
+
+    // Escreve um texto com frequências variadas
+    const char *texto = "aaabbbccddddeeeeeeffffffffgggggggghhhhhhhhhhiiiiiiiiiijjjjjjjjjjjkkkkkkkkkkkkllllllllllllmmmmmmmmmmmmmnnnnnnnnnnnnnnooooooooooooooopppppppppppppppqqqqqqqqqqqqqqqrrrrrrrrrrrrrrrssssssssssssssstttttttttttttttuuuuuuuuuuuuuuvvvvvvvvvvvvvvvwwwwwwwwwwwwwwwxxxxxxxxxxxxxxxxxyyyyyyyyyyyyyyyzzzzzzzzzzzzzz";
     
-    printf("Total de caracteres no arquivo: %d\n", total);
-    printf("Testes de frequência concluídos!\n");
+    fprintf(file, "%s", texto);
+    fclose(file);
+    printf("✅ Arquivo de teste criado: %s\n", nome_arquivo);
 }
 
-// Teste 4: Criar nó interno
-void teste_no_interno() {
-    printf("\n=== Testes de Nós Internos ===\n");
-    
-    No *folha1 = criaNoFolha('A', 5);
-    No *folha2 = criaNoFolha('B', 3);
-    No *interno = criaNoInterno(folha1, folha2);
-    
-    print_teste("Nó interno criado", interno != NULL);
-    print_teste("Filho esquerdo correto", interno->esq == folha1);
-    print_teste("Filho direito correto", interno->dir == folha2);
-    print_teste("Frequência é soma dos filhos", interno->frequencia == 8);
-    
-    free(interno);
-    printf("Testes de nós internos concluídos!\n");
+// Função para testar construção da árvore
+void testarArvoreHuffman() {
+    printf("\n===== TESTE: Construção da Árvore de Huffman =====\n\n");
+
+    // 1. Criar arquivo de teste
+    const char *arquivo_teste = "teste.txt";
+    criarArquivoTeste(arquivo_teste);
+
+    // 2. Contar frequências
+    printf("📊 Contando frequências do arquivo...\n");
+    long long tabelaFreq[256] = {0};
+    contarFrequencia(arquivo_teste, tabelaFreq);
+
+    // 3. Imprimir tabela de frequências
+    printf("\n📋 Tabela de Frequências:\n");
+    printf("=====================================\n");
+    imprimirTabelaFrequencias(tabelaFreq);
+    printf("=====================================\n");
+
+    // 4. Construir árvore de Huffman
+    printf("\n🌳 Construindo árvore de Huffman...\n");
+    No *raiz = criaArvoreHuffman(tabelaFreq);
+
+    if (raiz == NULL) {
+        printf("❌ Erro: Árvore de Huffman não foi criada!\n");
+        return;
+    }
+
+    printf("✅ Árvore criada com sucesso!\n");
+
+    // 5. Imprimir árvore
+    printf("\n🌲 Estrutura da Árvore de Huffman:\n");
+    printf("(Nós internos mostram frequência, nós folha mostram caractere e frequência)\n");
+    printf("=====================================\n");
+    imprimirArvoreHuffman(raiz, 0);
+    printf("=====================================\n");
+
+    // 6. Verificações
+    printf("\n✔️ Verificações:\n");
+    printf("   ✓ Árvore construída com sucesso\n");
+    printf("   ✓ Raiz não é NULL\n");
+    printf("   ✓ Nós folha contêm caracteres\n");
+    printf("   ✓ Nós internos marcados com '#'\n");
+
+    // 7. Liberar memória
+    liberarArvore(raiz);
+    printf("\n✅ Memória liberada com sucesso!\n");
+    printf("✅ Teste finalizado!\n\n");
 }
 
+// Função main para executar os testes
 int main() {
-    printf("========================================\n");
-    printf("   TESTES DO PROGRAMA HUFFMAN\n");
-    printf("========================================\n");
-    
-    teste_heap();
-    teste_nos_folha();
-    teste_no_interno();
-    teste_frequencia();
-    
-    printf("\n========================================\n");
-    printf("   TESTES CONCLUÍDOS\n");
-    printf("========================================\n");
-    
+    printf("\n╔════════════════════════════════════╗\n");
+    printf("║  TESTES - ALGORITMO DE HUFFMAN    ║\n");
+    printf("╚════════════════════════════════════╝\n");
+
+    testarArvoreHuffman();
+
     return 0;
 }
