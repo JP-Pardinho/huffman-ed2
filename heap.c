@@ -1,4 +1,5 @@
 #include "heap.h"
+#include "huffman.h"
 
 Heap *criaHeap(int capacidade) {
     Heap *h = (Heap *)malloc(sizeof(Heap));
@@ -85,10 +86,3 @@ void corrigeSubindo(Heap *h, int i) {
         corrigeSubindo(h, pai);
     }
 }
-
-int comparar(No *pai, No *filho) {
-    if (filho->frequencia < pai->frequencia)
-        return 1;
-    else 
-        return 0;
-} 

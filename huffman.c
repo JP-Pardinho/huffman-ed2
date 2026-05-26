@@ -28,6 +28,13 @@ No *criaNoInterno(No *esq, No *dir){
     return novo;
 }
 
+int comparar(No *pai, No *filho) {
+    if (filho->frequencia < pai->frequencia)
+        return 1;
+    else 
+        return 0;
+} 
+
 void contarFrequencia(const char *arquivo, long long *tabelaFreq){
     long long vetor[256] = {0};
 
@@ -72,10 +79,9 @@ No *criaArvoreHuffman(long long *frequencias){
 }
 
 void imprimirTabelaFrequencias(long long *frequencias){
-    printf("Tabela de Frequências:\n");
     for (int i = 0; i < 256; i++){
         if (frequencias[i] > 0){
-            printf("Caractere: '%c' (ASCII: %d) - Frequência: %lld\n", i, i, frequencias[i]);
+            printf("Caractere: '%c' - Frequência: %lld\n", i, frequencias[i]);
         }
     }
 }
@@ -91,10 +97,10 @@ void imprimirArvoreHuffman(No *raiz, int nivel){
         printf("  ");
     }
     if (raiz->caractere != '#'){
-        printf("Caractere: '%c' (ASCII: %d) - Frequência: %lld\n", raiz->caractere, raiz->caractere, raiz->frequencia);
+        printf("(%c) | (%lld)\n", raiz->caractere, raiz->frequencia);
     }
     else{
-        printf("Nó Interno - Frequência: %lld\n", raiz->frequencia);
+        printf("(%lld)\n", raiz->frequencia);
     }
 
     imprimirArvoreHuffman(raiz->dir, nivel + 1);
@@ -136,79 +142,64 @@ void gerarCodigosHuffman(No *raiz, char codigos[256][256], char *caminho, int ni
 }
 
 void compactar(const char *arquivoEntrada, const char *arquivoSaida, char codigos[256][256], long long *frequencias){
-
+    
     FILE *entrada = fopen(arquivoEntrada, "rb");
     if (entrada == NULL){
-        printf("Erro ao abrir o arquivo de entrada\n");
+        printf("Erro ao abrir arquivo\n");
         return;
     }
 
     FILE *saida = fopen(arquivoSaida, "wb");
     if (saida == NULL){
-        printf("Erro ao criar o arquivo de saída\n");
+        printf("Erro ao criar arquivo de saída\n");
         fclose(entrada);
         return;
     }
 
-    // PASSO 1: Salvar cabeçalho (frequências de cada caractere)
-    printf("Salvando cabeçalho do arquivo...\n");
+    // Salvar cabeçalho (frequências)
     for (int i = 0; i < 256; i++){
         fwrite(&frequencias[i], sizeof(long long), 1, saida);
     }
 
-    // PASSO 2: Compactar o arquivo bit por bit
-    printf("Compactando arquivo...\n");
+    // Contar caracteres originais
+    long long totalCaracteres = 0;
+    for (int i = 0; i < 256; i++){
+        totalCaracteres += frequencias[i];
+    }
+    fwrite(&totalCaracteres, sizeof(long long), 1, saida);  // Salva total de chars
+
+    // Compactar arquivo
     int c;
-    unsigned char byte_atual = 0;
-    int bits_no_buffer = 0;
-    long long bytes_originais = 0;
-    long long bits_escritos = 0;
+    unsigned char byteAtual = 0;
+    int bits = 0;
+    long long caractereLido = 0;
 
     while ((c = fgetc(entrada)) != EOF){
-        unsigned char ch = (unsigned char)c;
-        bytes_originais++;
+        caractereLido++;
+        const char *codigo = codigos[(unsigned char)c];
 
-        // Pega o código do caractere do dicionário
-        const char *codigo = codigos[ch];
-
-        // Adiciona cada bit do código ao buffer
         for (int i = 0; codigo[i] != '\0'; i++){
-            byte_atual = (byte_atual << 1) | (codigo[i] == '1' ? 1 : 0);
-            bits_no_buffer++;
-            bits_escritos++;
+            byteAtual = (byteAtual << 1) | (codigo[i] == '1' ? 1 : 0);
+            bits++;
 
-            // Se buffer cheio, escreve um byte
-            if (bits_no_buffer == 8){
-                fputc(byte_atual, saida);
-                byte_atual = 0;
-                bits_no_buffer = 0;
+            if (bits == 8){
+                fputc(byteAtual, saida);
+                byteAtual = 0;
+                bits = 0;
             }
         }
     }
 
-    // PASSO 3: Salvar último byte (com padding)
-    if (bits_no_buffer > 0){
-        byte_atual = byte_atual << (8 - bits_no_buffer);
-        fputc(byte_atual, saida);
-        fputc(bits_no_buffer, saida); // Salva quantos bits válidos
-    }
-    else{
-        fputc(0, saida); // Sem padding
+    // Salvar último byte se houver bits pendentes
+    if (bits > 0){
+        byteAtual = byteAtual << (8 - bits);
+        fputc(byteAtual, saida);
     }
 
-    // PASSO 4: Fechar arquivos
     fclose(entrada);
     fclose(saida);
 
-    // // PASSO 5: Mostrar estatísticas
-    // long long bytes_compactados = (bits_escritos + 7) / 8;
-    // double taxa = (1.0 - (double)bytes_compactados / bytes_originais) * 100;
-
-    // printf("\nArquivo compactado com sucesso!\n");
-    // printf("Estatísticas:\n");
-    // printf("Original: %lld bytes\n", bytes_originais);
-    // printf("Compactado: ~%lld bytes\n", bytes_compactados);
-    // printf("Taxa de compactação: %.2f%%\n", taxa);
+    printf("Arquivo compactado com sucesso!\n");
 }
 
 void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
@@ -232,6 +223,10 @@ void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
         fread(&frequencias[i], sizeof(long long), 1, entrada);
     }
 
+    // Ler total de caracteres originais
+    long long totalCaracteres = 0;
+    fread(&totalCaracteres, sizeof(long long), 1, entrada);
+
     // Reconstruir árvore de Huffman
     No *raiz = criaArvoreHuffman(frequencias);
     if (raiz == NULL){
@@ -244,41 +239,27 @@ void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
     // Descompactar arquivo
     int c;
     No *atual = raiz;
-    int bits_validos = 0;
-    int eh_ultimo_byte = 0;
+    long long caracteresEscritos = 0;
 
-    // Lê todos os bytes
-    while ((c = fgetc(entrada)) != EOF){
+    while ((c = fgetc(entrada)) != EOF && caracteresEscritos < totalCaracteres){
         unsigned char byte = (unsigned char)c;
 
-        // Se é o penúltimo byte lido, o próximo é padding info
-        int proximo = fgetc(entrada);
-        if (proximo == EOF){
-            // Este é o último byte, próximo indica padding
-            bits_validos = byte;
-            break;
-        }
-        else{
-            // Coloca de volta o byte que leu
-            ungetc(proximo, entrada);
-        }
-
         // Processa cada bit do byte (de cima para baixo: 7 até 0)
-        for (int i = 7; i >= 0; i--){
+        for (int i = 7; i >= 0 && caracteresEscritos < totalCaracteres; i--){
             int bit = (byte >> i) & 1;
 
             // Navega na árvore
             if (bit == 0){
                 atual = atual->esq;
-            }
-            else{
+            } else{
                 atual = atual->dir;
             }
 
             // Se chegou em uma folha, escreve o caractere
             if (atual != NULL && atual->caractere != '#'){
                 fputc(atual->caractere, saida);
-                atual = raiz; // Volta para a raiz
+                caracteresEscritos++;  // Conta caracteres
+                atual = raiz;
             }
         }
     }
@@ -286,4 +267,6 @@ void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
     fclose(entrada);
     fclose(saida);
     liberarArvore(raiz);
+
+    printf("Arquivo descompactado com sucesso!\n");
 }
