@@ -3,12 +3,15 @@
 
 void exibirMenu()
 {
-    printf("\n MENU \n");
-    printf("\n1 - Comprimir um arquivo\n");
-    printf("2 - Visualizar tabela de frequências\n");
-    printf("3 - Visualizar árvore de Huffman\n");
-    printf("4 - Descomprimir um arquivo\n");
-    printf("5 - Sair\n");
+    printf("\n+------------------------------------------------+\n");
+    printf("|                      MENU                      | \n");
+    printf("+------------------------------------------------+\n");
+    printf("|1 - Comprimir um arquivo------------------------|\n");
+    printf("|2 - Visualizar tabela de frequências------------|\n");
+    printf("|3 - Visualizar árvore de Huffman----------------|\n");
+    printf("|4 - Descomprimir um arquivo---------------------|\n");
+    printf("|5 - Sair----------------------------------------|\n");
+    printf("+------------------------------------------------+\n");
     printf("\nEscolha uma opção: ");
 }
 
@@ -41,7 +44,7 @@ int main()
             fgets(saida, sizeof(saida), stdin);
             saida[strcspn(saida, "\n")] = '\0';
 
-            // Verificar se arquivo existe
+            // Verificar se o arquivo existe
             FILE *teste = fopen(entrada, "r");
             if (teste == NULL)
             {

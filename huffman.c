@@ -1,8 +1,28 @@
 #include "huffman.h"
 
-No *criaNoFolha(unsigned char caractere, long long freq){
+/*
+Utilidade:
+-> Essa função serve para criar o nó contendo o caractere,
+a frequência desse caractere no arquivo de entrada e os
+ponteiros para esquerda e para direita começando com NULL
+
+Parâmetros:
+-> Unsigned char caractere: numero correspondente a certo
+caractere com base na tabela ASCII
+
+-> long long freq: valor corresponde a frequência de deter-
+minado caractere
+
+Retorno:
+-> A função retorna o nó criado
+
+*/
+
+No *criaNoFolha(unsigned char caractere, long long freq)
+{
     No *novo = (No *)malloc(sizeof(No));
-    if (novo == NULL){
+    if (novo == NULL)
+    {
         printf("\nNão foi possível aloccar o novo Nó!\n");
         exit(1);
     }
@@ -14,9 +34,11 @@ No *criaNoFolha(unsigned char caractere, long long freq){
     return novo;
 }
 
-No *criaNoInterno(No *esq, No *dir){
+No *criaNoInterno(No *esq, No *dir)
+{
     No *novo = (No *)malloc(sizeof(No));
-    if (novo == NULL){
+    if (novo == NULL)
+    {
         printf("\nNão foi possível aloccar o novo Nó!\n");
         exit(1);
     }
@@ -28,45 +50,88 @@ No *criaNoInterno(No *esq, No *dir){
     return novo;
 }
 
-int comparar(No *pai, No *filho) {
+/*
+Utilidade:
+-> Verificar se o nó filho tem menor frequência de caractere
+do que o nó pai
+
+Parâmetros:
+-> No* pai: Ponteiro para o nó pai
+-> No* filho: Ponteiro para o nó filho
+
+Retorno:
+-> Retorna 1: Se a frequência de caractere do nó filho é menor
+do que o do nó pai
+
+-> Retorna 0: Se a frequência de caractere do nó pai é menor
+do que o do nó filho
+
+*/
+
+int comparar(No *pai, No *filho)
+{
     if (filho->frequencia < pai->frequencia)
         return 1;
-    else 
+    else
         return 0;
-} 
+}
 
-void contarFrequencia(const char *arquivo, long long *tabelaFreq){
+/*
+Utilidade:
+-> Percorre o arquivo de entrada caractere por caractere e contabiliza
+a frequência de cada caractere, incrementando a posição correspondente ao seu
+valor na tabela ASCII no vetor de frequências.
+
+Parâmetros:
+-> Const char *arquivo: Ponteiro para a string com o nome do arquivo
+de entrada
+
+-> long long *tabelaFreq: Ponteiro para o vetor de frequencias de cada
+caractere
+
+Retorno: A função não retorna nada
+*/
+
+void contarFrequencia(const char *arquivo, long long *tabelaFreq)
+{
+
     long long vetor[256] = {0};
 
     FILE *file = fopen(arquivo, "r");
-    if (file == NULL){
+    if (file == NULL)
+    {
         printf("Erro ao abrir o arquivo.\n");
         exit(1);
     }
 
     int aux;
-    while ((aux = fgetc(file)) != EOF){
+    while ((aux = fgetc(file)) != EOF)
+    {
         vetor[(unsigned char)aux]++;
     }
     fclose(file);
 
-    for (int i = 0; i < 256; i++){
+    for (int i = 0; i < 256; i++)
+    {
         tabelaFreq[i] = vetor[i];
     }
 }
 
-No *criaArvoreHuffman(long long *frequencias){
+No *criaArvoreHuffman(long long *frequencias)
+{
     Heap *h = criaHeap(256);
     construirHeap(h, frequencias);
 
-    if (h->tamanho == 1){
+    if (h->tamanho == 1)
+    {
         No *folha = extraiMinimo(h);
         No *raiz = criaNoInterno(folha, NULL);
         liberaHeap(h);
         return raiz;
     }
 
-    while (h->tamanho > 1){
+    while (h->tamanho > 1)
+    {
         No *x = extraiMinimo(h);
         No *y = extraiMinimo(h);
         No *z = criaNoInterno(x, y);
@@ -78,44 +143,83 @@ No *criaArvoreHuffman(long long *frequencias){
     return raiz;
 }
 
-void imprimirTabelaFrequencias(long long *frequencias){
-    for (int i = 0; i < 256; i++){
-        if (frequencias[i] > 0){
+void imprimirTabelaFrequencias(long long *frequencias)
+{
+    for (int i = 0; i < 256; i++)
+    {
+        if (frequencias[i] > 0)
+        {
             printf("Caractere: '%c' - Frequência: %lld\n", i, frequencias[i]);
         }
     }
 }
 
-void imprimirArvoreHuffman(No *raiz, int nivel){
-    if (raiz == NULL){
+void imprimirArvoreHuffman(No *raiz, int nivel)
+{
+    if (raiz == NULL)
+    {
         return;
     }
 
     imprimirArvoreHuffman(raiz->esq, nivel + 1);
 
-    for (int i = 0; i < nivel; i++){
+    for (int i = 0; i < nivel; i++)
+    {
         printf("  ");
     }
-    if (raiz->caractere != '#'){
+    if (raiz->caractere != '#')
+    {
         printf("(%c) | (%lld)\n", raiz->caractere, raiz->frequencia);
     }
-    else{
+    else
+    {
         printf("(%lld)\n", raiz->frequencia);
     }
 
     imprimirArvoreHuffman(raiz->dir, nivel + 1);
 }
 
-void construirHeap(Heap *h, long long *frequencias){
-    for (int i = 0; i < 256; i++){
-        if (frequencias[i] > 0){
+/*
+Utilidade:
+-> Criação dos nós com as informações dos caracteres chamando a
+função CriaNoFolha e inserção desses nós no heap chamando a fun-
+ção insereHeap
+
+Parâmetros:
+-> Heap *h: Ponteiro para o nó do tipo Heap
+
+->long long *frequencias: ponteiro que aponta para elementos do
+tipo long long
+
+Retorno:
+-> A função não retorna nada
+
+*/
+void construirHeap(Heap *h, long long *frequencias)
+{
+    for (int i = 0; i < 256; i++)
+    {
+        if (frequencias[i] > 0)
+        {
             No *novoNo = criaNoFolha((unsigned char)i, frequencias[i]);
             insereHeap(h, novoNo);
         }
     }
 }
 
-void liberarArvore(No *raiz){
+/*
+Utilidade:
+-> Liberar toda a memória alocada para a árvore
+
+Parâmetros:
+-> No* raiz: Ponteiro para a raiz da árvore
+
+Retorno: A função não retorna nada
+
+*/
+
+void liberarArvore(No *raiz)
+{
     if (raiz == NULL)
         return;
 
@@ -124,11 +228,13 @@ void liberarArvore(No *raiz){
     free(raiz);
 }
 
-void gerarCodigosHuffman(No *raiz, char codigos[256][256], char *caminho, int nivel){
+void gerarCodigosHuffman(No *raiz, char codigos[256][256], char *caminho, int nivel)
+{
     if (raiz == NULL)
         return;
 
-    if (raiz->esq == NULL && raiz->dir == NULL){
+    if (raiz->esq == NULL && raiz->dir == NULL)
+    {
         caminho[nivel] = '\0';
         strcpy(codigos[raiz->caractere], caminho);
         return;
@@ -141,32 +247,37 @@ void gerarCodigosHuffman(No *raiz, char codigos[256][256], char *caminho, int ni
     gerarCodigosHuffman(raiz->dir, codigos, caminho, nivel + 1);
 }
 
-void compactar(const char *arquivoEntrada, const char *arquivoSaida, char codigos[256][256], long long *frequencias){
-    
+void compactar(const char *arquivoEntrada, const char *arquivoSaida, char codigos[256][256], long long *frequencias)
+{
+
     FILE *entrada = fopen(arquivoEntrada, "rb");
-    if (entrada == NULL){
+    if (entrada == NULL)
+    {
         printf("Erro ao abrir arquivo\n");
         return;
     }
 
     FILE *saida = fopen(arquivoSaida, "wb");
-    if (saida == NULL){
+    if (saida == NULL)
+    {
         printf("Erro ao criar arquivo de saída\n");
         fclose(entrada);
         return;
     }
 
     // Salvar cabeçalho (frequências)
-    for (int i = 0; i < 256; i++){
+    for (int i = 0; i < 256; i++)
+    {
         fwrite(&frequencias[i], sizeof(long long), 1, saida);
     }
 
     // Contar caracteres originais
     long long totalCaracteres = 0;
-    for (int i = 0; i < 256; i++){
+    for (int i = 0; i < 256; i++)
+    {
         totalCaracteres += frequencias[i];
     }
-    fwrite(&totalCaracteres, sizeof(long long), 1, saida);  // Salva total de chars
+    fwrite(&totalCaracteres, sizeof(long long), 1, saida); // Salva total de chars
 
     // Compactar arquivo
     int c;
@@ -174,15 +285,18 @@ void compactar(const char *arquivoEntrada, const char *arquivoSaida, char codigo
     int bits = 0;
     long long caractereLido = 0;
 
-    while ((c = fgetc(entrada)) != EOF){
+    while ((c = fgetc(entrada)) != EOF)
+    {
         caractereLido++;
         const char *codigo = codigos[(unsigned char)c];
 
-        for (int i = 0; codigo[i] != '\0'; i++){
+        for (int i = 0; codigo[i] != '\0'; i++)
+        {
             byteAtual = (byteAtual << 1) | (codigo[i] == '1' ? 1 : 0);
             bits++;
 
-            if (bits == 8){
+            if (bits == 8)
+            {
                 fputc(byteAtual, saida);
                 byteAtual = 0;
                 bits = 0;
@@ -191,7 +305,8 @@ void compactar(const char *arquivoEntrada, const char *arquivoSaida, char codigo
     }
 
     // Salvar último byte se houver bits pendentes
-    if (bits > 0){
+    if (bits > 0)
+    {
         byteAtual = byteAtual << (8 - bits);
         fputc(byteAtual, saida);
     }
@@ -202,16 +317,19 @@ void compactar(const char *arquivoEntrada, const char *arquivoSaida, char codigo
     printf("Arquivo compactado com sucesso!\n");
 }
 
-void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
+void descompactar(const char *arquivoEntrada, const char *arquivoSaida)
+{
 
     FILE *entrada = fopen(arquivoEntrada, "rb");
-    if (entrada == NULL){
+    if (entrada == NULL)
+    {
         printf("Erro ao abrir arquivo compactado\n");
         return;
     }
 
     FILE *saida = fopen(arquivoSaida, "wb");
-    if (saida == NULL){
+    if (saida == NULL)
+    {
         printf("Erro ao criar arquivo de saída\n");
         fclose(entrada);
         return;
@@ -219,7 +337,8 @@ void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
 
     // Ler cabeçalho (frequências)
     long long frequencias[256] = {0};
-    for (int i = 0; i < 256; i++){
+    for (int i = 0; i < 256; i++)
+    {
         fread(&frequencias[i], sizeof(long long), 1, entrada);
     }
 
@@ -229,7 +348,8 @@ void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
 
     // Reconstruir árvore de Huffman
     No *raiz = criaArvoreHuffman(frequencias);
-    if (raiz == NULL){
+    if (raiz == NULL)
+    {
         printf("Erro ao reconstruir árvore\n");
         fclose(entrada);
         fclose(saida);
@@ -241,24 +361,30 @@ void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
     No *atual = raiz;
     long long caracteresEscritos = 0;
 
-    while ((c = fgetc(entrada)) != EOF && caracteresEscritos < totalCaracteres){
+    while ((c = fgetc(entrada)) != EOF && caracteresEscritos < totalCaracteres)
+    {
         unsigned char byte = (unsigned char)c;
 
         // Processa cada bit do byte (de cima para baixo: 7 até 0)
-        for (int i = 7; i >= 0 && caracteresEscritos < totalCaracteres; i--){
+        for (int i = 7; i >= 0 && caracteresEscritos < totalCaracteres; i--)
+        {
             int bit = (byte >> i) & 1;
 
             // Navega na árvore
-            if (bit == 0){
+            if (bit == 0)
+            {
                 atual = atual->esq;
-            } else{
+            }
+            else
+            {
                 atual = atual->dir;
             }
 
             // Se chegou em uma folha, escreve o caractere
-            if (atual != NULL && atual->caractere != '#'){
+            if (atual != NULL && atual->caractere != '#')
+            {
                 fputc(atual->caractere, saida);
-                caracteresEscritos++;  // Conta caracteres
+                caracteresEscritos++; // Conta caracteres
                 atual = raiz;
             }
         }
