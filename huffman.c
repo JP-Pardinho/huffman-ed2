@@ -160,7 +160,15 @@ No *criaArvoreHuffman(long long *frequencias){
 void imprimirTabelaFrequencias(long long *frequencias){
     for (int i = 0; i < 256; i++){
         if (frequencias[i] > 0){
-            printf("Caractere: '%c' - Frequência: %lld\n", i, frequencias[i]);
+            if (i == '\n') {
+                printf("Caractere: '\\n' - Frequência: %lld\n", frequencias[i]);
+            } else if (i == '\t') {
+                printf("Caractere: '\\t' - Frequência: %lld\n", frequencias[i]);
+            } else if (i == ' ') {
+                printf("Caractere: ' ' - Frequência: %lld\n", frequencias[i]);
+            } else {
+                printf("Caractere: '%c' - Frequência: %lld\n", i, frequencias[i]);
+            }
         }
     }
 }
@@ -203,7 +211,15 @@ void imprimirArvoreHuffman(No *raiz, int nivel, int caminhos[]) {
     }
 
     if (raiz->caractere != '\0') {
-        printf("'%c'(%lld)", raiz->caractere, raiz->frequencia);
+        if (raiz->caractere == '\n') {
+            printf("'\\n'(%lld)", raiz->frequencia);
+        } else if (raiz->caractere == '\t') {
+            printf("'\\t'(%lld)", raiz->frequencia);
+        } else if (raiz->caractere == ' ') {
+            printf("' '(%lld)", raiz->frequencia);
+        } else {
+            printf("'%c'(%lld)", raiz->caractere, raiz->frequencia);
+        }
     } else {
         printf("[%lld]", raiz->frequencia);
     }
