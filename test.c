@@ -5,23 +5,26 @@
 #include "heap.h"
 
 // Função para criar arquivo de teste
-void criarArquivoTeste(const char *nome_arquivo) {
+void criarArquivoTeste(const char *nome_arquivo)
+{
     FILE *file = fopen(nome_arquivo, "w");
-    if (file == NULL) {
+    if (file == NULL)
+    {
         printf("Erro ao criar arquivo de teste.\n");
         exit(1);
     }
 
     // Escreve um texto com frequências variadas
     const char *texto = "aaabbbccddddeeeeeeffffffffgggggggghhhhhhhhhhiiiiiiiiiijjjjjjjjjjjkkkkkkkkkkkkllllllllllllmmmmmmmmmmmmmnnnnnnnnnnnnnnooooooooooooooopppppppppppppppqqqqqqqqqqqqqqqrrrrrrrrrrrrrrrssssssssssssssstttttttttttttttuuuuuuuuuuuuuuvvvvvvvvvvvvvvvwwwwwwwwwwwwwwwxxxxxxxxxxxxxxxxxyyyyyyyyyyyyyyyzzzzzzzzzzzzzz";
-    
+
     fprintf(file, "%s", texto);
     fclose(file);
     printf("✅ Arquivo de teste criado: %s\n", nome_arquivo);
 }
 
 // Função para testar construção da árvore
-void testarArvoreHuffman() {
+void testarArvoreHuffman()
+{
     printf("\n===== TESTE: Construção da Árvore de Huffman =====\n\n");
 
     // 1. Criar arquivo de teste
@@ -43,7 +46,8 @@ void testarArvoreHuffman() {
     printf("\n🌳 Construindo árvore de Huffman...\n");
     No *raiz = criaArvoreHuffman(tabelaFreq);
 
-    if (raiz == NULL) {
+    if (raiz == NULL)
+    {
         printf("❌ Erro: Árvore de Huffman não foi criada!\n");
         return;
     }
@@ -51,10 +55,11 @@ void testarArvoreHuffman() {
     printf("✅ Árvore criada com sucesso!\n");
 
     // 5. Imprimir árvore
+    int caminhos[100] = {0};
     printf("\n🌲 Estrutura da Árvore de Huffman:\n");
     printf("(Nós internos mostram frequência, nós folha mostram caractere e frequência)\n");
     printf("=====================================\n");
-    imprimirArvoreHuffman(raiz, 0);
+    imprimirArvoreHuffman(raiz, 0, caminhos);
     printf("=====================================\n");
 
     // 6. Verificações
@@ -71,7 +76,8 @@ void testarArvoreHuffman() {
 }
 
 // Função main para executar os testes
-int main() {
+int main()
+{
     printf("\n╔════════════════════════════════════╗\n");
     printf("║  TESTES - ALGORITMO DE HUFFMAN    ║\n");
     printf("╚════════════════════════════════════╝\n");

@@ -73,6 +73,17 @@ void insereHeap(Heap *h, void *dado)
     corrigeSubindo(h, h->tamanho - 1);
 }
 
+/*
+Utilidade:
+-> A função extrai a raiz do heap mínimo
+
+Parâmetros: 
+-> Heap *h: Ponteiro para nó do tipo Heap
+
+Retorno:
+-> A função não retorna nada
+
+*/
 void *extraiMinimo(Heap *h)
 {
     if (h == NULL || h->tamanho == 0)
@@ -85,6 +96,18 @@ void *extraiMinimo(Heap *h)
     return raiz;
 }
 
+/*
+Utilidade:
+-> Liberar toda a memória alocada para o heap
+
+Parâmetros:
+-> Heap * h: Ponteiro para o nó do tipo Heap
+
+Retorno:
+-> A função não retorna nada
+
+
+*/
 void liberaHeap(Heap *h)
 {
     if (h != NULL)
@@ -112,6 +135,22 @@ void troca(void **a, void **b)
     *b = aux;
 }
 
+
+/*
+Utilidade:
+-> Função responsável por corrigir o heap colocando o elemento 
+que está na posição errada na posição certa descendo recursivamente 
+ele
+
+Parâmetros:
+-> Heap *h: Ponteiro para o nó de tipo Heap
+-> int i: Representa o índice do nó que se analisa se está na posição
+correta
+
+Retorno:
+-> A função não retorna nada
+
+*/
 void corrigeDescendo(Heap *h, int i)
 {
     int menor = i;

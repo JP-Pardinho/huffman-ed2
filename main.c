@@ -1,6 +1,24 @@
+/*
+Grupo 6
+- Gabriel dos Santos            | Matricula: 2023201331
+- Nicolas Leal Espindula        | Matricula:
+- João Pedro Pardinho Rodrigues | Matricula:
+*/
 #include "huffman.h"
 #include "heap.h"
 
+/*
+Utilidade:
+-> A função exibe o menu com as opções possíveis de realizar
+
+Parâmetros:
+-> A função não recebe parâmetros
+
+Retorno:
+-> A função não retorna nada
+
+
+*/
 void exibirMenu()
 {
     printf("\n+------------------------------------------------+\n");
@@ -36,13 +54,17 @@ int main()
             // Comprimir um arquivo
             char entrada[256], saida[256];
 
-            printf("\nNome do arquivo de entrada (.txt): ");
+            printf("\nNome do arquivo de entrada (Sem a extensao): ");
             fgets(entrada, sizeof(entrada), stdin);
             entrada[strcspn(entrada, "\n")] = '\0'; // Remove '\n'
 
-            printf("Nome do arquivo de saída: ");
+            strcat(entrada, ".txt");
+
+            printf("Nome do arquivo de saída (Sem a extensao): ");
             fgets(saida, sizeof(saida), stdin);
             saida[strcspn(saida, "\n")] = '\0';
+
+            strcat(saida, ".bin");
 
             // Verificar se o arquivo existe
             FILE *teste = fopen(entrada, "r");
@@ -102,6 +124,7 @@ int main()
 
         case 3:
         {
+            int caminhos[100] = {0};
             // Visualizar árvore de Huffman
             if (raiz == NULL)
             {
@@ -116,8 +139,7 @@ int main()
             printf("(Nós internos: frequência)\n");
             printf("(Nós folha: caractere e frequência)\n");
             printf("════════════════════════════════════\n");
-            imprimirArvoreHuffman(raiz, 0);
-            printf("════════════════════════════════════\n");
+            imprimirArvoreHuffman(raiz, 0, caminhos);
 
             printf("\nPressione Enter para voltar ao menu...");
             getchar();
@@ -129,13 +151,17 @@ int main()
             // Descomprimir um arquivo
             char entrada[256], saida[256];
 
-            printf("\nNome do arquivo comprimido: ");
+            printf("\nNome do arquivo comprimido (Sem a extensao): ");
             fgets(entrada, sizeof(entrada), stdin);
             entrada[strcspn(entrada, "\n")] = '\0';
 
-            printf("Nome do arquivo de saída (.txt): ");
+            strcat(entrada, ".bin");
+
+            printf("Nome do arquivo de saída (Sem a extensão): ");
             fgets(saida, sizeof(saida), stdin);
             saida[strcspn(saida, "\n")] = '\0';
+
+            strcat(saida, ".txt");
 
             // Verificar se arquivo existe
             FILE *teste = fopen(entrada, "rb");
