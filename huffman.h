@@ -6,32 +6,24 @@
 #include <string.h>
 #include "heap.h"
 
-// typedef struct no {
-//     unsigned char caractere;
-//     long long frequencia;
-//     struct no *esq;
-//     struct no *dir;
-// } No;
+typedef struct no {
+    unsigned char caractere;
+    long long frequencia;
+    struct no *esq;
+    struct no *dir;
+} No;
 
 No *criaNoFolha(unsigned char caractere, long long freq);
 No *criaNoInterno(No *esq, No *dir);
-void contarFrequencia(const char *arquivo, long long *tamanho);
-void imprimirTabelaFrequencias(long long *frequencias);
 No *criaArvoreHuffman(long long *frequencias);
-void construirHeap(Heap *h, long long *frequencias);
-
-// ...existing code...
-
-void imprimirArvoreHuffman(No *raiz, int nivel);
+int comparar(No *pai, No *filho);
 void liberarArvore(No *raiz);
-
-// --- FUNÇÕES A IMPLEMENTAR --- 
-// Imprimir arvore de huffman
-// Imprimir tabela de frequencias 
-// Construir a arvore de huffman
-// Gerar codigos de huffman
-// Compactar o arquivo 
-// Descompactar o arquivo 
-// (DEVE HAVER UM CABEÇALHO NO ARQUIVO COMPACTAR PARA QUE SEJA POSSÍVEL RECONSTRUIR A ÁRVORE DE HUFFMAN)
+void construirHeap(Heap *h, long long *frequencias);
+void imprimirTabelaFrequencias(long long *frequencias);
+void imprimirArvoreHuffman(No *raiz, int nivel, int caminhos[]);
+void contarFrequencia(const char *arquivo, long long *tamanho);
+void gerarCodigosHuffman(No *raiz, char codigos[256][256], char *caminho, int nivel);
+void compactar(const char *arquivoEntrada, const char *arquivoSaida, char codigos[256][256], long long *frequencias);
+void descompactar(const char *arquivoEntrada, const char *arquivoSaida, No **raiz, long long *frequencias);
 
 #endif
