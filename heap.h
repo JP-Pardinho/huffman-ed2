@@ -20,5 +20,6 @@ void corrigeSubindo(Heap *h, int i);
 void corrigeDescendo(Heap *h, int i);
 void troca(void **a, void **b);
 void liberaHeap(Heap *h);
+void imprimirArvoreHuffman(No *raiz, int nivel, int caminhos[]);
 
 #endif

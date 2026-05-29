@@ -1,6 +1,19 @@
 #include "heap.h"
 #include "huffman.h"
 
+/*
+    Utilidade:
+    -> Cria o Heap que possui os campos void** dados, int tamanho
+    e int capacidade alocando um vetor de ponteiros do tipo void
+
+    Parâmetros:
+    -> int capacidade: Numero inteiro que define o tamanho que terá
+    o vetor de ponteiros
+
+    Retorno:
+    -> A função retorna o endereço do Heap criado
+
+*/
 Heap *criaHeap(int capacidade) {
     Heap *h = (Heap *)malloc(sizeof(Heap));
 
@@ -22,6 +35,20 @@ Heap *criaHeap(int capacidade) {
     return h;
 }
 
+/*
+    Utilidade:
+    -> Insere um novo nó no vetor de ponteiros que é o heap
+    e corrige o que quebra a condição de heap mínimo
+
+    Parâmetros:
+    -> Heap* h: Ponteiro para o nó do tipo heap
+
+    -> void *dado: Ponteiro para void que armazena
+    as informações do caractere
+
+    Retorno: 
+    -> A função não retorna nada
+*/
 void insereHeap(Heap *h, void *dado) {
     if (h == NULL) {
         return;
@@ -37,6 +64,16 @@ void insereHeap(Heap *h, void *dado) {
     corrigeSubindo(h, h->tamanho - 1);
 }
 
+/*
+    Utilidade:
+    -> A função extrai a raiz do heap mínimo
+
+    Parâmetros: 
+    -> Heap *h: Ponteiro para nó do tipo Heap
+
+    Retorno:
+    -> A função não retorna nada
+*/
 void *extraiMinimo(Heap *h) {
     if (h == NULL || h->tamanho == 0) 
         return NULL;
@@ -48,6 +85,16 @@ void *extraiMinimo(Heap *h) {
     return raiz;
 }
 
+/*
+    Utilidade:
+    -> Liberar toda a memória alocada para o heap
+    
+    Parâmetros:
+    -> Heap * h: Ponteiro para o Heap
+    
+    Retorno:
+    -> A função não retorna nada
+*/
 void liberaHeap(Heap *h) {
     if (h != NULL) {
         free(h->dados);
@@ -55,12 +102,36 @@ void liberaHeap(Heap *h) {
     }
 }
 
+/*
+    Utilidade:
+    -> Função responsável por trocar o apontamento de dois ponteiros
+
+    Parâmetros:
+    -> void **a: Recebe o endereço do ponteiro
+    -> void **b: Recebe o endereço do outro ponteiro
+
+    Retorno: A função não retorna nada
+*/
 void troca(void **a, void **b) {
     void *aux = *a;
     *a = *b;
     *b = aux;
 }
 
+/*
+    Utilidade:
+    -> Função responsável por corrigir o heap colocando o elemento 
+    que está na posição errada na posição certa descendo recursivamente 
+    ele
+
+    Parâmetros:
+    -> Heap *h: Ponteiro para o Heap
+    -> int i: Representa o índice do ponteiro que se analisa se está na posição
+    correta (corrigir)
+
+    Retorno:
+    -> A função não retorna nada
+*/
 void corrigeDescendo(Heap *h, int i) {
     int menor = i;
     int esq = 2*i + 1;
@@ -78,6 +149,18 @@ void corrigeDescendo(Heap *h, int i) {
     }
 }
 
+/*
+    Utilidade:
+    -> Manter a propriedade de heap mínimo quando se adiciona um elemento ao heap
+
+    Paramêntros:
+    -> Heap *h: ponteiro que aponta para o Heap
+
+    -> int i: índice do último elemento adicionado ao heap
+
+    Retorno: 
+    -> A função não retorna nada
+*/
 void corrigeSubindo(Heap *h, int i) {
     int pai = (i - 1) / 2;
 

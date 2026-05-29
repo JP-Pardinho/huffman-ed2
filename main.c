@@ -1,14 +1,34 @@
+/*
+    Grupo 6
+    - Gabriel dos Santos            |  Matricula: 2023201331
+    - João Pedro Pardinho Rodrigues |  Matricula: 2023201073
+    - Nicolas Leal Espindula        |  Matricula: 2023200798
+*/
+
 #include "huffman.h"
 #include "heap.h"
 
+/*
+    Utilidade:
+    -> A função exibe o menu com as opções possíveis de realizar
+
+    Parâmetros:
+    -> A função não recebe parâmetros
+
+    Retorno:
+    -> A função não retorna nada
+*/
 void exibirMenu()
 {
-    printf("\n MENU \n");
-    printf("\n1 - Comprimir um arquivo\n");
-    printf("2 - Visualizar tabela de frequências\n");
-    printf("3 - Visualizar árvore de Huffman\n");
-    printf("4 - Descomprimir um arquivo\n");
-    printf("5 - Sair\n");
+    printf("\n+------------------------------------------------+\n");
+    printf("|                      MENU                      | \n");
+    printf("+------------------------------------------------+\n");
+    printf("| 1 - Comprimir um arquivo                       |\n");
+    printf("| 2 - Visualizar tabela de frequências           |\n");
+    printf("| 3 - Visualizar árvore de Huffman               |\n");
+    printf("| 4 - Descomprimir um arquivo                    |\n");
+    printf("| 5 - Sair                                       |\n");
+    printf("+------------------------------------------------+\n");
     printf("\nEscolha uma opção: ");
 }
 
@@ -24,24 +44,26 @@ int main()
     {
         exibirMenu();
         scanf("%d", &opcao);
-        getchar(); // Limpa o '\n' do buffer
+        getchar();
 
         switch (opcao)
         {
         case 1:
         {
-            // Comprimir um arquivo
             char entrada[256], saida[256];
 
-            printf("\nNome do arquivo de entrada (.txt): ");
+            printf("\nNome do arquivo de entrada (Sem a extensão): ");
             fgets(entrada, sizeof(entrada), stdin);
-            entrada[strcspn(entrada, "\n")] = '\0'; // Remove '\n'
+            entrada[strcspn(entrada, "\n")] = '\0'; 
 
-            printf("Nome do arquivo de saída: ");
+            strcat(entrada, ".txt");
+
+            printf("Nome do arquivo de saída (Sem a extensão): ");
             fgets(saida, sizeof(saida), stdin);
             saida[strcspn(saida, "\n")] = '\0';
 
-            // Verificar se arquivo existe
+            strcat(saida, ".bin");
+
             FILE *teste = fopen(entrada, "r");
             if (teste == NULL)
             {
@@ -50,27 +72,22 @@ int main()
             }
             fclose(teste);
 
-            // Salvar nome do arquivo atual
             strcpy(arquivoAtual, entrada);
 
-            // Contar frequências
             contarFrequencia(entrada, frequencias);
 
-            // Construir árvore
             if (raiz != NULL)
                 liberarArvore(raiz);
             raiz = criaArvoreHuffman(frequencias);
 
-            if (raiz == NULL){
+            if (raiz == NULL) {
                 printf("Erro ao construir árvore!\n");
                 break;
             }
 
-            // Gerar dicionário
             char codigo[256] = {0};
             gerarCodigosHuffman(raiz, dicionario, codigo, 0);
 
-            // Compactar
             compactar(entrada, saida, dicionario, frequencias);
 
             printf("Arquivo compactado!\n");
@@ -79,7 +96,6 @@ int main()
 
         case 2:
         {
-            // Visualizar tabela de frequências
             if (arquivoAtual[0] == '\0')
             {
                 printf("Nenhum arquivo foi comprimido ainda!\n");
@@ -98,7 +114,8 @@ int main()
 
         case 3:
         {
-            // Visualizar árvore de Huffman
+            int caminhos[100] = {0};
+
             if (raiz == NULL)
             {
                 printf("Nenhuma árvore construída ainda!\n");
@@ -112,8 +129,8 @@ int main()
             printf("(Nós internos: frequência)\n");
             printf("(Nós folha: caractere e frequência)\n");
             printf("════════════════════════════════════\n");
-            imprimirArvoreHuffman(raiz, 0);
-            printf("════════════════════════════════════\n");
+            imprimirArvoreHuffman(raiz, 0, caminhos);
+            printf("\n════════════════════════════════════\n");
 
             printf("\nPressione Enter para voltar ao menu...");
             getchar();
@@ -122,18 +139,20 @@ int main()
 
         case 4:
         {
-            // Descomprimir um arquivo
             char entrada[256], saida[256];
 
-            printf("\nNome do arquivo comprimido: ");
+            printf("\nNome do arquivo comprimido (Sem a extensão): ");
             fgets(entrada, sizeof(entrada), stdin);
             entrada[strcspn(entrada, "\n")] = '\0';
 
-            printf("Nome do arquivo de saída (.txt): ");
+            strcat(entrada, ".bin");
+
+            printf("Nome do arquivo de saída (Sem a extensão): ");
             fgets(saida, sizeof(saida), stdin);
             saida[strcspn(saida, "\n")] = '\0';
 
-            // Verificar se arquivo existe
+            strcat(saida, ".txt");
+
             FILE *teste = fopen(entrada, "rb");
             if (teste == NULL)
             {
@@ -143,15 +162,17 @@ int main()
             fclose(teste);
 
             printf("Descompactando arquivo...\n");
-            descompactar(entrada, saida);
+            descompactar(entrada, saida, &raiz, frequencias);
+
+            strcpy(arquivoAtual, saida);
 
             printf("Arquivo descompactado com sucesso!\n");
+            printf("Tabela de frequências e árvore atualizadas!\n");
             break;
         }
 
         case 5:
         {
-            // Sair
             printf("\nPrograma encerrado\n");
             if (raiz != NULL)
                 liberarArvore(raiz);
