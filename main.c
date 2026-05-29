@@ -61,8 +61,7 @@ int main()
                 liberarArvore(raiz);
             raiz = criaArvoreHuffman(frequencias);
 
-            if (raiz == NULL)
-            {
+            if (raiz == NULL){
                 printf("Erro ao construir árvore!\n");
                 break;
             }

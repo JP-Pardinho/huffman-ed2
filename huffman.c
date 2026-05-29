@@ -21,7 +21,7 @@ No *criaNoInterno(No *esq, No *dir){
         exit(1);
     }
 
-    novo->caractere = '#';
+    novo->caractere = '\0';
     novo->frequencia = esq->frequencia + dir->frequencia;
     novo->esq = esq;
     novo->dir = dir;
@@ -61,7 +61,9 @@ No *criaArvoreHuffman(long long *frequencias){
 
     if (h->tamanho == 1){
         No *folha = extraiMinimo(h);
-        No *raiz = criaNoInterno(folha, NULL);
+        // Criar um nó interno com a folha à esquerda E um nó vazio à direita
+        No *noBranco = criaNoFolha('\0', 0);  // Nó auxiliar vazio
+        No *raiz = criaNoInterno(folha, noBranco);
         liberaHeap(h);
         return raiz;
     }
@@ -96,7 +98,7 @@ void imprimirArvoreHuffman(No *raiz, int nivel){
     for (int i = 0; i < nivel; i++){
         printf("  ");
     }
-    if (raiz->caractere != '#'){
+    if (raiz->caractere != '\0'){
         printf("(%c) | (%lld)\n", raiz->caractere, raiz->frequencia);
     }
     else{
@@ -256,9 +258,9 @@ void descompactar(const char *arquivoEntrada, const char *arquivoSaida){
             }
 
             // Se chegou em uma folha, escreve o caractere
-            if (atual != NULL && atual->caractere != '#'){
+            if (atual != NULL && atual->caractere != '\0'){
                 fputc(atual->caractere, saida);
-                caracteresEscritos++;  // Conta caracteres
+                caracteresEscritos++; 
                 atual = raiz;
             }
         }
